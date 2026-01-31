@@ -27,65 +27,33 @@ const App: React.FC = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.DASHBOARD);
   
-  // Data State - Initially empty, hydrated on login
   const [properties, setProperties] = useState<Property[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [userPlan, setUserPlan] = useState<'Free' | 'Premium'>('Free');
   const [preselectedClient, setPreselectedClient] = useState<Client | null>(null);
 
-  // Helper to generate user-specific storage keys
-  const getStorageKey = (base: string) => `${base}_${currentUserEmail}`;
+  const getStorageKey = (base: string) => `${base}_${currentUserEmail?.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
-  // Hydrate data when a user logs in
   useEffect(() => {
     if (isLoggedIn && currentUserEmail) {
       const savedProps = localStorage.getItem(getStorageKey('propmate_properties'));
       const savedClients = localStorage.getItem(getStorageKey('propmate_clients'));
       const savedReminders = localStorage.getItem(getStorageKey('propmate_reminders'));
 
-      setProperties(savedProps ? JSON.parse(savedProps) : MOCK_PROPERTIES);
-      setClients(savedClients ? JSON.parse(savedClients) : MOCK_CLIENTS);
+      setProperties(savedProps ? JSON.parse(savedProps) : MOCK_PROPERTIES.map(p => ({...p, isFavorite: false})));
+      setClients(savedClients ? JSON.parse(savedClients) : MOCK_CLIENTS.map(c => ({...c, isFavorite: false})));
       setReminders(savedReminders ? JSON.parse(savedReminders) : []);
     }
   }, [isLoggedIn, currentUserEmail]);
 
-  // Persistent storage sync (only when logged in)
   useEffect(() => {
     if (isLoggedIn && currentUserEmail) {
       localStorage.setItem(getStorageKey('propmate_properties'), JSON.stringify(properties));
-    }
-  }, [properties, isLoggedIn, currentUserEmail]);
-
-  useEffect(() => {
-    if (isLoggedIn && currentUserEmail) {
       localStorage.setItem(getStorageKey('propmate_clients'), JSON.stringify(clients));
-    }
-  }, [clients, isLoggedIn, currentUserEmail]);
-
-  useEffect(() => {
-    if (isLoggedIn && currentUserEmail) {
       localStorage.setItem(getStorageKey('propmate_reminders'), JSON.stringify(reminders));
     }
-  }, [reminders, isLoggedIn, currentUserEmail]);
-
-  // Background Reminder Checker
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    const interval = setInterval(() => {
-      const now = new Date();
-      let changed = false;
-      const updatedReminders = reminders.map(r => {
-        if (!r.isCompleted && !r.notified && new Date(r.time) <= now) {
-          changed = true;
-          return { ...r, notified: true };
-        }
-        return r;
-      });
-      if (changed) setReminders(updatedReminders);
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [reminders, isLoggedIn]);
+  }, [properties, clients, reminders, isLoggedIn, currentUserEmail]);
 
   const handleLogin = (email: string) => {
     setCurrentUserEmail(email);
@@ -96,20 +64,26 @@ const App: React.FC = () => {
     setIsLoggedIn(false);
     setCurrentUserEmail(null);
     setActiveTab(NavigationTab.DASHBOARD);
-    // Reset state to prevent flash of previous user's data
     setProperties([]);
     setClients([]);
     setReminders([]);
   };
 
-  if (!isLoggedIn) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
+  const deleteProperty = (id: string) => setProperties(properties.filter(p => p.id !== id));
+  const deleteClient = (id: string) => setClients(clients.filter(c => c.id !== id));
+  const deleteReminder = (id: string) => setReminders(reminders.filter(r => r.id !== id));
+
+  const toggleFavoriteProperty = (id: string) => {
+    setProperties(properties.map(p => p.id === id ? { ...p, isFavorite: !p.isFavorite } : p));
+  };
+  const toggleFavoriteClient = (id: string) => {
+    setClients(clients.map(c => c.id === id ? { ...c, isFavorite: !c.isFavorite } : c));
+  };
 
   const addProperty = (prop: Property) => setProperties([prop, ...properties]);
   const addClient = (client: Client) => setClients([client, ...clients]);
-  
   const addReminder = (rem: Reminder) => setReminders([rem, ...reminders]);
+
   const toggleReminder = (id: string) => {
     setReminders(reminders.map(r => r.id === id ? { 
       ...r, 
@@ -120,18 +94,32 @@ const App: React.FC = () => {
   const updateReminder = (id: string, updates: Partial<Reminder>) => {
     setReminders(reminders.map(r => r.id === id ? { ...r, ...updates } : r));
   };
-  const deleteReminder = (id: string) => {
-    setReminders(reminders.filter(r => r.id !== id));
-  };
 
   const renderContent = () => {
     switch (activeTab) {
       case NavigationTab.DASHBOARD:
-        return <Dashboard properties={properties} clients={clients} reminders={reminders} onToggleReminder={toggleReminder} />;
+        return <Dashboard 
+          properties={properties} 
+          clients={clients} 
+          reminders={reminders} 
+          onToggleReminder={toggleReminder} 
+          onNavigate={(tab: NavigationTab) => setActiveTab(tab)}
+        />;
       case NavigationTab.PROPERTIES:
-        return <PropertiesPage properties={properties} onAdd={addProperty} />;
+        return <PropertiesPage 
+          properties={properties} 
+          onAdd={addProperty} 
+          onDelete={deleteProperty}
+          onToggleFavorite={toggleFavoriteProperty}
+        />;
       case NavigationTab.CLIENTS:
-        return <ClientsPage clients={clients} onAdd={addClient} onAutoMatch={(c) => { setPreselectedClient(c); setActiveTab(NavigationTab.MATCHING); }} />;
+        return <ClientsPage 
+          clients={clients} 
+          onAdd={addClient} 
+          onDelete={deleteClient}
+          onToggleFavorite={toggleFavoriteClient}
+          onAutoMatch={(c) => { setPreselectedClient(c); setActiveTab(NavigationTab.MATCHING); }} 
+        />;
       case NavigationTab.MATCHING:
         return <MatchingPage properties={properties} clients={clients} initialClient={preselectedClient} />;
       case NavigationTab.REPORTS:
@@ -140,16 +128,16 @@ const App: React.FC = () => {
         return <SettingsPage userPlan={userPlan} onUpgrade={() => setUserPlan('Premium')} onLogout={handleLogout} />;
       case NavigationTab.REMINDERS:
         return <RemindersPage 
-                  reminders={reminders} 
-                  clients={clients} 
-                  properties={properties} 
-                  onAdd={addReminder} 
-                  onToggle={toggleReminder} 
-                  onUpdate={updateReminder}
-                  onDelete={deleteReminder} 
-               />;
+          reminders={reminders} 
+          clients={clients} 
+          properties={properties} 
+          onAdd={addReminder} 
+          onToggle={toggleReminder} 
+          onUpdate={updateReminder}
+          onDelete={deleteReminder} 
+        />;
       default:
-        return <Dashboard properties={properties} clients={clients} reminders={reminders} onToggleReminder={toggleReminder} />;
+        return <Dashboard properties={properties} clients={clients} reminders={reminders} onToggleReminder={toggleReminder} onNavigate={(tab: any) => setActiveTab(tab)} />;
     }
   };
 

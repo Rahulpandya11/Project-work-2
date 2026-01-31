@@ -52,6 +52,11 @@ export enum ReminderStatus {
   NO_SHOW = 'No-Show'
 }
 
+export enum ListingSource {
+  DIRECT = 'Direct',
+  BROKER = 'Broker'
+}
+
 export interface Property {
   id: string;
   tenantId: string;
@@ -83,6 +88,9 @@ export interface Property {
     area: string;
     city: string;
   };
+  listingSource: ListingSource;
+  brokerName?: string;
+  isFavorite: boolean;
   createdAt: string;
 }
 
@@ -106,6 +114,7 @@ export interface Client {
   moveInDate: string;
   leadStage: LeadStage;
   tags: string[];
+  isFavorite: boolean;
   createdAt: string;
 }
 

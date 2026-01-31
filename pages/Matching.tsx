@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Property, Client, MatchResult, TransactionType, FurnishingStatus } from '../types';
-import { Zap, Sparkles, AlertCircle, CheckCircle2, Info, ChevronRight } from 'lucide-react';
+import { Zap, Sparkles, AlertCircle, CheckCircle2, Info, ChevronRight, MapPin } from 'lucide-react';
 import { getAIRecommendationSummary } from '../geminiService';
 
 interface MatchingPageProps {
@@ -36,11 +36,20 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
       reasons.push(prop.price > client.budgetMax ? "Over budget" : "Below budget floor");
     }
 
-    // Area (25%)
-    if (client.preferredAreas.some(a => prop.location.area.toLowerCase().includes(a.toLowerCase()))) {
+    // City/Area Precision (25%) - New check for strict area match
+    const isStrictAreaMatch = client.preferredAreas.some(a => 
+      prop.location.area.toLowerCase() === a.toLowerCase() || 
+      prop.location.city.toLowerCase() === client.preferredCity.toLowerCase()
+    );
+    if (isStrictAreaMatch) {
       breakdown.area = 25;
     } else {
-      reasons.push("Different neighborhood");
+      // Location Proximity (General vicinity check) (20% implied in logic but we balance it)
+      if (client.preferredAreas.some(a => prop.location.area.toLowerCase().includes(a.toLowerCase()))) {
+        breakdown.area = 15;
+      } else {
+        reasons.push("Different city/area");
+      }
     }
 
     // BHK (15%)
@@ -50,21 +59,14 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
       reasons.push(`${prop.bhk} vs Preferred ${client.bhkPreference.join('/')}`);
     }
 
-    // Furnishing (10%)
+    // Furnishing & Lifestyle (20% total)
     if (client.furnishingPreference.includes(prop.furnishing) || client.furnishingPreference.includes(FurnishingStatus.ANY)) {
       breakdown.furnishing = 10;
     }
-
-    // Lifestyle / Tenant Type (10%)
     if (client.maritalStatus === 'Bachelor' && prop.bachelorsAllowed) {
       breakdown.lifestyle = 10;
     } else if (client.maritalStatus === 'Married') {
       breakdown.lifestyle = 10;
-    }
-
-    // Transaction & Availability (10%)
-    if (prop.transactionType === client.requirement) {
-      breakdown.availability = 10;
     }
 
     score = Object.values(breakdown).reduce((a, b) => a + b, 0);
@@ -132,8 +134,8 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
                     <span className="font-bold text-indigo-100">₹{selectedClient?.budgetMax.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-indigo-400 font-black uppercase tracking-widest text-[9px]">Config Preferred</span>
-                    <span className="font-bold text-indigo-100">{selectedClient?.bhkPreference.join('/')}</span>
+                    <span className="text-indigo-400 font-black uppercase tracking-widest text-[9px]">City/Area Pref</span>
+                    <span className="font-bold text-indigo-100">{selectedClient?.preferredCity} / {selectedClient?.preferredAreas[0]}</span>
                   </div>
                 </div>
              </div>
@@ -145,10 +147,10 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
                 <Info size={16} className="text-indigo-500" /> Scoring Parameter Weights
              </h4>
              <div className="space-y-4">
-               <WeightBar label="Price Compliance" weight={30} color="bg-indigo-600" />
-               <WeightBar label="Locality Match" weight={25} color="bg-indigo-500" />
-               <WeightBar label="Configuration" weight={15} color="bg-indigo-400" />
-               <WeightBar label="Availability" weight={30} color="bg-indigo-300" />
+               <WeightBar label="Budget Compliance" weight={30} color="bg-indigo-600" />
+               <WeightBar label="Location Proximity" weight={20} color="bg-indigo-500" />
+               <WeightBar label="Configuration (BHK)" weight={15} color="bg-indigo-400" />
+               <WeightBar label="City/Area Precision" weight={25} color="bg-indigo-300" />
              </div>
           </div>
         </div>
@@ -171,7 +173,7 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
                     <div>
                       <h3 className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">{property.title}</h3>
                       <p className="text-sm text-slate-500 font-bold mt-1 flex items-center gap-2">
-                         <MapPin size={14} className="text-indigo-600"/> {property.location.area} • <span className="text-slate-900">₹{property.price.toLocaleString()}</span>
+                         <MapPin size={14} className="text-indigo-600"/> {property.location.area}, {property.location.city} • <span className="text-slate-900">₹{property.price.toLocaleString()}</span>
                       </p>
                     </div>
                     <div className="text-right">
@@ -184,7 +186,7 @@ export const MatchingPage: React.FC<MatchingPageProps> = ({ properties, clients,
 
                   <div className="flex flex-wrap gap-2">
                      <BreakdownChip label="Price" score={result.breakdown.budget} max={30} />
-                     <BreakdownChip label="Location" score={result.breakdown.area} max={25} />
+                     <BreakdownChip label="Area" score={result.breakdown.area} max={25} />
                      <BreakdownChip label="Config" score={result.breakdown.bhk} max={15} />
                   </div>
 
@@ -242,9 +244,3 @@ const BreakdownChip = ({ label, score, max }: { label: string, score: number, ma
     </span>
   );
 };
-
-const MapPin = ({ size, className }: { size: number, className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-  </svg>
-);

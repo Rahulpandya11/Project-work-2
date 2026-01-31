@@ -1,5 +1,5 @@
 
-import { Property, Client, PropertyType, TransactionType, PropertyStatus, FurnishingStatus, LeadStage } from './types';
+import { Property, Client, PropertyType, TransactionType, PropertyStatus, FurnishingStatus, LeadStage, ListingSource } from './types';
 
 export const MOCK_PROPERTIES: Property[] = [
   {
@@ -29,6 +29,9 @@ export const MOCK_PROPERTIES: Property[] = [
     status: PropertyStatus.AVAILABLE,
     location: { address: 'Plot 45, Bandra West', area: 'Bandra', city: 'Mumbai' },
     photos: ['https://picsum.photos/seed/prop1/800/600'],
+    // Fix: Added listingSource and isFavorite
+    listingSource: ListingSource.DIRECT,
+    isFavorite: false,
     createdAt: '2023-10-01'
   },
   {
@@ -58,6 +61,10 @@ export const MOCK_PROPERTIES: Property[] = [
     status: PropertyStatus.AVAILABLE,
     location: { address: 'Sector 5, Alibaug', area: 'Alibaug', city: 'Raigad' },
     photos: ['https://picsum.photos/seed/prop2/800/600'],
+    // Fix: Added listingSource, brokerName and isFavorite
+    listingSource: ListingSource.BROKER,
+    brokerName: 'Elite Realty',
+    isFavorite: true,
     createdAt: '2023-09-15'
   }
 ];
@@ -82,6 +89,8 @@ export const MOCK_CLIENTS: Client[] = [
     moveInDate: '2023-12-15',
     leadStage: LeadStage.SITE_VISIT,
     tags: ['High Priority', 'Family'],
+    // Fix: Added isFavorite
+    isFavorite: true,
     createdAt: '2023-10-10'
   },
   {
@@ -103,6 +112,8 @@ export const MOCK_CLIENTS: Client[] = [
     moveInDate: '2024-02-01',
     leadStage: LeadStage.NEGOTIATION,
     tags: ['Investor', 'Luxury'],
+    // Fix: Added isFavorite
+    isFavorite: false,
     createdAt: '2023-09-01'
   }
 ];

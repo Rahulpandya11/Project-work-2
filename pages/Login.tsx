@@ -27,7 +27,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
       if (user) {
         onLogin(email);
       } else {
-        setError('Invalid credentials. Please use demo accounts provided below.');
+        setError('Invalid credentials. Access restricted to authorized agent accounts.');
         setIsLoading(false);
       }
     }, 800);
@@ -47,16 +47,16 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-200 mb-6 transform hover:rotate-6 transition-transform">
                 <span className="text-white font-bold text-3xl">P</span>
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">PropMate Workspace</h1>
-              <p className="text-slate-500 mt-2 text-sm font-medium">Isolated Agent Environments</p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">PropMate Portal</h1>
+              <p className="text-slate-500 mt-2 text-sm font-medium">Secure Real Estate Workspace</p>
             </div>
 
             <div className="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-[1.5rem] space-y-4">
               <div className="flex items-start gap-3">
                 <Info className="text-indigo-600 shrink-0 mt-0.5" size={18} />
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-indigo-900 uppercase tracking-[0.2em]">Multi-Tenant Demo</p>
-                  <p className="text-[11px] text-indigo-700 leading-relaxed">Each user below has their own private database. Data added to User 1 will not show up for User 2.</p>
+                  <p className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Workspace Isolation</p>
+                  <p className="text-[11px] text-indigo-700 leading-relaxed">Select an account below to enter your private environment. Data is not shared between accounts.</p>
                 </div>
               </div>
               
@@ -64,31 +64,25 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                 <button 
                   type="button"
                   onClick={() => { setEmail('agent@propmate.ai'); setPassword('password123'); }}
-                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all group"
+                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all"
                 >
-                  <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">User 1 (Primary)</p>
                   <p className="text-xs font-bold text-slate-700">agent@propmate.ai</p>
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest">Environment A</p>
                 </button>
                 <button 
                   type="button"
                   onClick={() => { setEmail('agent+1@propmate.ai'); setPassword('password123'); }}
-                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all group"
+                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all"
                 >
-                  <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">User 2 (Isolated)</p>
                   <p className="text-xs font-bold text-slate-700">agent+1@propmate.ai</p>
+                  <p className="text-[9px] text-slate-400 uppercase tracking-widest">Environment B</p>
                 </button>
               </div>
             </div>
 
-            {error && (
-              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-xl animate-in shake duration-300">
-                {error}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Work Email</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
@@ -96,13 +90,13 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:outline-none transition-all font-black tracking-tight"
+                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Security Pass</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
@@ -110,7 +104,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:outline-none transition-all font-black tracking-tight"
+                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                   />
                 </div>
               </div>
@@ -118,17 +112,17 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
               <button 
                 type="submit" 
                 disabled={isLoading}
-                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-2xl shadow-indigo-500/30 transition-all active:scale-95 disabled:opacity-70 group"
+                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-xl transition-all active:scale-95"
               >
-                {isLoading ? 'Authenticating...' : 'Enter Workspace'}
-                {!isLoading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
+                {isLoading ? 'Loading Workspace...' : 'Sign In'}
+                {!isLoading && <ArrowRight size={18} />}
               </button>
             </form>
           </div>
 
           <div className="bg-slate-50 px-8 py-6 border-t border-slate-100 flex items-center justify-center gap-3">
              <ShieldCheck size={18} className="text-indigo-600" />
-             <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.25em]">End-to-End Isolated Tenants</span>
+             <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Encrypted Local Data Isolation</span>
           </div>
         </div>
       </div>

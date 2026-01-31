@@ -15,7 +15,7 @@ interface SettingsPageProps {
 export const SettingsPage: React.FC<SettingsPageProps> = ({ userPlan, onUpgrade, onLogout }) => {
   const [activeSection, setActiveSection] = useState('profile');
   const [isUpgrading, setIsUpgrading] = useState(false);
-  const [weights, setWeights] = useState({ budget: 30, location: 25, bhk: 15, others: 30 });
+  const [weights, setWeights] = useState({ budget: 30, location: 20, bhk: 15, cityArea: 25, others: 10 });
 
   const handleUpgrade = () => {
     setIsUpgrading(true);
@@ -99,7 +99,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userPlan, onUpgrade,
               <div className="space-y-10 animate-in slide-in-from-bottom-4">
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 tracking-tight">Matching Logic Tuning</h3>
-                  <p className="text-sm text-slate-500 font-medium">Adjust the weights to prioritize different match criteria.</p>
+                  <p className="text-sm text-slate-500 font-medium">Adjust the weights to prioritize different match criteria for your leads.</p>
                 </div>
 
                 <div className="space-y-12">
@@ -113,7 +113,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userPlan, onUpgrade,
                     label="Location Proximity" 
                     value={weights.location} 
                     onChange={(v) => setWeights({...weights, location: v})} 
-                    desc="Influence of the client's preferred area on the final match score."
+                    desc="Influence of general vicinity and neighborhood preference."
                    />
                    <SliderItem 
                     label="Configuration (BHK)" 
@@ -121,13 +121,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userPlan, onUpgrade,
                     onChange={(v) => setWeights({...weights, bhk: v})} 
                     desc="Weightage of room count and floor preferences."
                    />
+                   <SliderItem 
+                    label="City/Area Match" 
+                    value={weights.cityArea} 
+                    onChange={(v) => setWeights({...weights, cityArea: v})} 
+                    desc="Precision score for matching exact city and specific area name strings."
+                   />
                 </div>
 
                 <div className="p-8 bg-amber-50 rounded-[2rem] border border-amber-100 flex items-start gap-5">
                    <Info className="text-amber-600 mt-1" size={24} />
                    <div>
                       <h4 className="text-sm font-black text-amber-900 uppercase tracking-widest">Expert Tip</h4>
-                      <p className="text-xs text-amber-700 leading-relaxed font-medium mt-1">Increasing Budget Compliance weight helps in markets where prices are extremely rigid. For luxury markets, prioritize Location and BHK.</p>
+                      <p className="text-xs text-amber-700 leading-relaxed font-medium mt-1">For picky clients, increase 'City/Area Match'. For those open to nearby alternatives, increase 'Location Proximity' but lower 'City/Area Match'.</p>
                    </div>
                 </div>
               </div>
