@@ -3,18 +3,33 @@ import React, { useState } from 'react';
 import { Lock, Mail, ArrowRight, ShieldCheck, Info } from 'lucide-react';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin: (email: string) => void;
 }
 
 export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('agent@propmate.ai');
+  const [password, setPassword] = useState('password123');
+  const [error, setError] = useState('');
+
+  const validUsers = [
+    { email: 'agent@propmate.ai', password: 'password123' },
+    { email: 'agent+1@propmate.ai', password: 'password123' }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+
     setTimeout(() => {
-      setIsLoading(false);
-      onLogin();
+      const user = validUsers.find(u => u.email === email && u.password === password);
+      if (user) {
+        onLogin(email);
+      } else {
+        setError('Invalid credentials. Please use demo accounts provided below.');
+        setIsLoading(false);
+      }
     }, 800);
   };
 
@@ -29,62 +44,91 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
         <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden">
           <div className="p-10 md:p-12">
             <div className="flex flex-col items-center mb-10 text-center">
-              <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-200 mb-6">
+              <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-200 mb-6 transform hover:rotate-6 transition-transform">
                 <span className="text-white font-bold text-3xl">P</span>
               </div>
               <h1 className="text-3xl font-bold text-slate-900 tracking-tight">PropMate Workspace</h1>
-              <p className="text-slate-500 mt-2 text-sm">Sign in to your private agent portal</p>
+              <p className="text-slate-500 mt-2 text-sm font-medium">Isolated Agent Environments</p>
             </div>
 
-            <div className="mb-8 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-start gap-3">
-              <Info className="text-indigo-600 shrink-0 mt-0.5" size={18} />
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-indigo-900 uppercase tracking-wider">Demo Credentials</p>
-                <p className="text-[11px] text-indigo-700">Email: <span className="font-mono font-bold">agent@propmate.ai</span></p>
-                <p className="text-[11px] text-indigo-700">Pass: <span className="font-mono font-bold">password123</span></p>
+            <div className="mb-8 p-5 bg-indigo-50 border border-indigo-100 rounded-[1.5rem] space-y-4">
+              <div className="flex items-start gap-3">
+                <Info className="text-indigo-600 shrink-0 mt-0.5" size={18} />
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-indigo-900 uppercase tracking-[0.2em]">Multi-Tenant Demo</p>
+                  <p className="text-[11px] text-indigo-700 leading-relaxed">Each user below has their own private database. Data added to User 1 will not show up for User 2.</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2">
+                <button 
+                  type="button"
+                  onClick={() => { setEmail('agent@propmate.ai'); setPassword('password123'); }}
+                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all group"
+                >
+                  <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">User 1 (Primary)</p>
+                  <p className="text-xs font-bold text-slate-700">agent@propmate.ai</p>
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => { setEmail('agent+1@propmate.ai'); setPassword('password123'); }}
+                  className="text-left px-4 py-3 bg-white border border-indigo-100 rounded-xl hover:border-indigo-400 transition-all group"
+                >
+                  <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">User 2 (Isolated)</p>
+                  <p className="text-xs font-bold text-slate-700">agent+1@propmate.ai</p>
+                </button>
               </div>
             </div>
 
+            {error && (
+              <div className="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold rounded-xl animate-in shake duration-300">
+                {error}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Work Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
                     type="email" 
                     required
-                    defaultValue="agent@propmate.ai"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all font-medium"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:outline-none transition-all font-black tracking-tight"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Security Pass</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                   <input 
                     type="password" 
                     required
-                    defaultValue="password123"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all font-medium"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-14 pr-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:outline-none transition-all font-black tracking-tight"
                   />
                 </div>
               </div>
 
               <button 
                 type="submit" 
-                className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all active:scale-95"
+                disabled={isLoading}
+                className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-2xl shadow-indigo-500/30 transition-all active:scale-95 disabled:opacity-70 group"
               >
-                Enter My Workspace
-                <ArrowRight size={18} />
+                {isLoading ? 'Authenticating...' : 'Enter Workspace'}
+                {!isLoading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
               </button>
             </form>
           </div>
 
-          <div className="bg-slate-50 px-8 py-6 border-t border-slate-100 flex items-center justify-center gap-2">
-             <ShieldCheck size={16} className="text-slate-400" />
-             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Isolated Tenant Data Access</span>
+          <div className="bg-slate-50 px-8 py-6 border-t border-slate-100 flex items-center justify-center gap-3">
+             <ShieldCheck size={18} className="text-indigo-600" />
+             <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.25em]">End-to-End Isolated Tenants</span>
           </div>
         </div>
       </div>

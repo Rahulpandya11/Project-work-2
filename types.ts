@@ -36,6 +36,22 @@ export enum LeadStage {
   LOST = 'Lost'
 }
 
+export enum ReminderType {
+  MEETING = 'Meeting',
+  SITE_VISIT = 'Site Visit',
+  CALL = 'Follow-up Call',
+  PAYMENT = 'Payment Collection',
+  OTHER = 'Other'
+}
+
+export enum ReminderStatus {
+  PENDING = 'Pending',
+  COMPLETED = 'Completed',
+  RESCHEDULED = 'Rescheduled',
+  CANCELLED = 'Cancelled',
+  NO_SHOW = 'No-Show'
+}
+
 export interface Property {
   id: string;
   tenantId: string;
@@ -47,7 +63,7 @@ export interface Property {
   negotiable: boolean;
   carpetArea: number;
   builtUpArea: number;
-  bhk: string; // 1RK, 1BHK, etc.
+  bhk: string;
   floorNumber: number;
   totalFloors: number;
   buildingName: string;
@@ -76,13 +92,13 @@ export interface Client {
   name: string;
   phone: string;
   email?: string;
-  description: string; // Added description
+  description: string;
   profession?: string;
   maritalStatus: 'Married' | 'Bachelor';
   familySize: number;
   requirement: TransactionType;
   preferredAreas: string[];
-  preferredCity: string; // Added city explicitly
+  preferredCity: string;
   bhkPreference: string[];
   furnishingPreference: FurnishingStatus[];
   budgetMin: number;
@@ -90,6 +106,23 @@ export interface Client {
   moveInDate: string;
   leadStage: LeadStage;
   tags: string[];
+  createdAt: string;
+}
+
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  type: ReminderType;
+  status: ReminderStatus;
+  clientId?: string;
+  propertyId?: string;
+  isCompleted: boolean;
+  notified: boolean;
+  clientPresent?: boolean;
+  ownerPresent?: boolean;
+  rescheduleCount: number;
   createdAt: string;
 }
 
