@@ -58,13 +58,13 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({ properties, onAd
           <input 
             type="text" 
             placeholder="Search location, title, or building..." 
-            className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
+            className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <select 
-          className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black uppercase tracking-widest cursor-pointer"
+          className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black uppercase tracking-widest cursor-pointer text-black"
           onChange={(e) => setSelectedType(e.target.value as any)}
         >
           <option value="All">All Property Types</option>
@@ -96,7 +96,7 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({ properties, onAd
 
             <div className="p-8 space-y-5">
               <div className="flex justify-between items-start gap-4">
-                <h3 className="font-black text-slate-900 text-xl tracking-tight line-clamp-1 group-hover:text-indigo-600 transition-colors" onClick={() => setSelectedProperty(prop)}>{prop.title}</h3>
+                <h3 className="font-black text-black text-xl tracking-tight line-clamp-1 group-hover:text-indigo-600 transition-colors cursor-pointer" onClick={() => setSelectedProperty(prop)}>{prop.title}</h3>
                 <button 
                   onClick={(e) => { e.stopPropagation(); if(confirm("Delete this listing?")) onDelete(prop.id); }}
                   className="text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
@@ -105,25 +105,25 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({ properties, onAd
                 </button>
               </div>
               
-              <div className="flex items-center gap-2 text-slate-500 text-sm font-bold">
+              <div className="flex items-center gap-2 text-slate-900 text-sm font-black">
                 <MapPin size={16} className="text-indigo-600" /> {prop.location.area}, {prop.location.city}
               </div>
 
               <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
                  <div className="flex items-center gap-2">
                     <Bed size={14} className="text-indigo-600" />
-                    <span className="text-xs font-black text-slate-900">{prop.bhk}</span>
+                    <span className="text-xs font-black text-black">{prop.bhk}</span>
                  </div>
                  <div className="flex items-center gap-2">
                     <Maximize2 size={14} className="text-indigo-600" />
-                    <span className="text-xs font-black text-slate-900">{prop.carpetArea} sqft</span>
+                    <span className="text-xs font-black text-black">{prop.carpetArea} sqft</span>
                  </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">
                 <div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pricing</p>
-                  <span className="text-2xl font-black text-slate-900 tracking-tight">₹{prop.price.toLocaleString()}</span>
+                  <span className="text-2xl font-black text-black tracking-tight">₹{prop.price.toLocaleString()}</span>
                 </div>
                 <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest ${prop.status === PropertyStatus.AVAILABLE ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
                   {prop.status}
@@ -164,18 +164,23 @@ const PropertyDetailModal: React.FC<{ property: Property; onClose: () => void; o
                 {property.listingSource} {property.listingSource === ListingSource.BROKER && `• Broker: ${property.brokerName}`}
               </span>
             </div>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">{property.title}</h2>
-            <div className="flex items-center gap-2 text-slate-500 text-sm font-bold"><MapPin size={18} className="text-indigo-600"/> {property.location.address}</div>
+            <h2 className="text-4xl font-black text-black tracking-tight leading-tight">{property.title}</h2>
+            <div className="flex items-center gap-2 text-slate-900 text-sm font-black"><MapPin size={18} className="text-indigo-600"/> {property.location.address}</div>
+          </div>
+
+          <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-4">
+             <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Listing Description</h4>
+             <p className="text-black text-lg font-bold leading-relaxed">{property.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Asking Price</p>
-              <p className="text-3xl font-black text-slate-900">₹{property.price.toLocaleString()}</p>
+              <p className="text-3xl font-black text-black">₹{property.price.toLocaleString()}</p>
             </div>
             <div className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Carpet Area</p>
-              <p className="text-3xl font-black text-slate-900">{property.carpetArea} <span className="text-sm font-bold text-slate-400">SQFT</span></p>
+              <p className="text-3xl font-black text-black">{property.carpetArea} <span className="text-sm font-black text-slate-400">SQFT</span></p>
             </div>
           </div>
 
@@ -218,7 +223,7 @@ const SpecItem = ({ icon, label, value }: { icon: any, label: string, value: str
     </div>
     <div>
       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
-      <p className="text-sm font-black text-slate-900">{value}</p>
+      <p className="text-sm font-black text-black">{value}</p>
     </div>
   </div>
 );
@@ -290,13 +295,13 @@ const AddPropertyModal: React.FC<{ onClose: () => void; onAdd: (p: Property) => 
             <div className="space-y-8">
               <section className="space-y-4">
                  <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-50 pb-2">Core Info</h4>
-                 <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Property Title (e.g. Modern 2BHK in Bandra)" onChange={e => setFormData({...formData, title: e.target.value})} />
-                 <textarea required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold min-h-[120px]" placeholder="Detailed Description..." onChange={e => setFormData({...formData, description: e.target.value})} />
+                 <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Property Title (e.g. Modern 2BHK in Bandra)" onChange={e => setFormData({...formData, title: e.target.value})} />
+                 <textarea required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black min-h-[120px]" placeholder="Detailed Description..." onChange={e => setFormData({...formData, description: e.target.value})} />
                  <div className="grid grid-cols-2 gap-4">
-                   <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" onChange={e => setFormData({...formData, transactionType: e.target.value as any})}>
+                   <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, transactionType: e.target.value as any})}>
                       {Object.values(TransactionType).map(t => <option key={t} value={t}>{t}</option>)}
                    </select>
-                   <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" onChange={e => setFormData({...formData, type: e.target.value as any})}>
+                   <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, type: e.target.value as any})}>
                       {Object.values(PropertyType).map(t => <option key={t} value={t}>{t}</option>)}
                    </select>
                  </div>
@@ -305,18 +310,18 @@ const AddPropertyModal: React.FC<{ onClose: () => void; onAdd: (p: Property) => 
               <section className="space-y-4">
                  <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-50 pb-2">Location & Source</h4>
                  <div className="grid grid-cols-2 gap-4">
-                    <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Area / Locality" onChange={e => setFormData({...formData, location: {...formData.location!, area: e.target.value}})} />
-                    <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Building Name" onChange={e => setFormData({...formData, buildingName: e.target.value})} />
+                    <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Area / Locality" onChange={e => setFormData({...formData, location: {...formData.location!, area: e.target.value}})} />
+                    <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Building Name" onChange={e => setFormData({...formData, buildingName: e.target.value})} />
                  </div>
-                 <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Full Address" onChange={e => setFormData({...formData, location: {...formData.location!, address: e.target.value}})} />
+                 <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Full Address" onChange={e => setFormData({...formData, location: {...formData.location!, address: e.target.value}})} />
                  
                  <div className="grid grid-cols-2 gap-4">
-                    <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" onChange={e => setFormData({...formData, listingSource: e.target.value as any})}>
+                    <select className="px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, listingSource: e.target.value as any})}>
                        <option value={ListingSource.DIRECT}>Direct (Owner)</option>
                        <option value={ListingSource.BROKER}>Via Broker</option>
                     </select>
                     {formData.listingSource === ListingSource.BROKER && (
-                      <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold animate-in slide-in-from-left-2" placeholder="Broker/Co-Agent Name" onChange={e => setFormData({...formData, brokerName: e.target.value})} />
+                      <input required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black animate-in slide-in-from-left-2" placeholder="Broker/Co-Agent Name" onChange={e => setFormData({...formData, brokerName: e.target.value})} />
                     )}
                  </div>
               </section>
@@ -326,21 +331,21 @@ const AddPropertyModal: React.FC<{ onClose: () => void; onAdd: (p: Property) => 
               <section className="space-y-4">
                  <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-50 pb-2">Specifications & Pricing</h4>
                  <div className="grid grid-cols-2 gap-4">
-                   <input required type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Price (₹)" onChange={e => setFormData({...formData, price: Number(e.target.value)})} />
-                   <input required type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Carpet Area (sqft)" onChange={e => setFormData({...formData, carpetArea: Number(e.target.value)})} />
+                   <input required type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Price (₹)" onChange={e => setFormData({...formData, price: Number(e.target.value)})} />
+                   <input required type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Carpet Area (sqft)" onChange={e => setFormData({...formData, carpetArea: Number(e.target.value)})} />
                  </div>
                  <div className="grid grid-cols-3 gap-4">
-                    <select className="px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold" onChange={e => setFormData({...formData, bhk: e.target.value})}>
+                    <select className="px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-black" onChange={e => setFormData({...formData, bhk: e.target.value})}>
                       {['1RK', '1BHK', '2BHK', '3BHK', '4BHK', '5BHK+'].map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
-                    <select className="px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold" onChange={e => setFormData({...formData, facing: e.target.value as any})}>
+                    <select className="px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-black" onChange={e => setFormData({...formData, facing: e.target.value as any})}>
                       {['East', 'West', 'North', 'South', 'Other'].map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
-                    <input type="number" className="w-full px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold" placeholder="Bldg Age (Yrs)" onChange={e => setFormData({...formData, ageOfBuilding: Number(e.target.value)})} />
+                    <input type="number" className="w-full px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black text-black" placeholder="Bldg Age (Yrs)" onChange={e => setFormData({...formData, ageOfBuilding: Number(e.target.value)})} />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
-                    <input type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Floor Number" onChange={e => setFormData({...formData, floorNumber: Number(e.target.value)})} />
-                    <input type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" placeholder="Total Floors" onChange={e => setFormData({...formData, totalFloors: Number(e.target.value)})} />
+                    <input type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Floor Number" onChange={e => setFormData({...formData, floorNumber: Number(e.target.value)})} />
+                    <input type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" placeholder="Total Floors" onChange={e => setFormData({...formData, totalFloors: Number(e.target.value)})} />
                  </div>
               </section>
 
@@ -354,7 +359,7 @@ const AddPropertyModal: React.FC<{ onClose: () => void; onAdd: (p: Property) => 
                     <AmenityCheckbox label="Bachelors Allowed" checked={formData.bachelorsAllowed || false} onChange={v => setFormData({...formData, bachelorsAllowed: v})} />
                     <AmenityCheckbox label="Negotiable Price" checked={formData.negotiable || false} onChange={v => setFormData({...formData, negotiable: v})} />
                  </div>
-                 <select className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold" onChange={e => setFormData({...formData, furnishing: e.target.value as any})}>
+                 <select className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, furnishing: e.target.value as any})}>
                    {Object.values(FurnishingStatus).map(s => <option key={s} value={s}>{s} Furnishing</option>)}
                  </select>
               </section>
@@ -379,6 +384,6 @@ const AmenityCheckbox = ({ label, checked, onChange }: { label: string, checked:
     >
       {checked && <CheckCircle2 size={14} className="text-white" />}
     </div>
-    <span className="text-xs font-bold text-slate-600">{label}</span>
+    <span className="text-xs font-black text-slate-900">{label}</span>
   </label>
 );

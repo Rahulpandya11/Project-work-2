@@ -33,25 +33,31 @@ const App: React.FC = () => {
   const [userPlan, setUserPlan] = useState<'Free' | 'Premium'>('Free');
   const [preselectedClient, setPreselectedClient] = useState<Client | null>(null);
 
-  const getStorageKey = (base: string) => `${base}_${currentUserEmail?.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  // Keyed specifically to user to simulate Vercel DB multi-tenancy locally
+  const getStorageKey = (base: string) => `propmate_${currentUserEmail?.replace(/[^a-zA-Z0-9]/g, '_')}_${base}`;
 
   useEffect(() => {
     if (isLoggedIn && currentUserEmail) {
-      const savedProps = localStorage.getItem(getStorageKey('propmate_properties'));
-      const savedClients = localStorage.getItem(getStorageKey('propmate_clients'));
-      const savedReminders = localStorage.getItem(getStorageKey('propmate_reminders'));
+      const savedProps = localStorage.getItem(getStorageKey('properties'));
+      const savedClients = localStorage.getItem(getStorageKey('clients'));
+      const savedReminders = localStorage.getItem(getStorageKey('reminders'));
 
-      setProperties(savedProps ? JSON.parse(savedProps) : MOCK_PROPERTIES.map(p => ({...p, isFavorite: false})));
-      setClients(savedClients ? JSON.parse(savedClients) : MOCK_CLIENTS.map(c => ({...c, isFavorite: false})));
+      setProperties(savedProps ? JSON.parse(savedProps) : MOCK_PROPERTIES.map(p => ({...p, isFavorite: false, tenantId: currentUserEmail})));
+      setClients(savedClients ? JSON.parse(savedClients) : MOCK_CLIENTS.map(c => ({...c, isFavorite: false, tenantId: currentUserEmail})));
       setReminders(savedReminders ? JSON.parse(savedReminders) : []);
+      
+      // Auto-premium for Piyush
+      if (currentUserEmail === 'Piyushdidwania@gmail.com') {
+        setUserPlan('Premium');
+      }
     }
   }, [isLoggedIn, currentUserEmail]);
 
   useEffect(() => {
     if (isLoggedIn && currentUserEmail) {
-      localStorage.setItem(getStorageKey('propmate_properties'), JSON.stringify(properties));
-      localStorage.setItem(getStorageKey('propmate_clients'), JSON.stringify(clients));
-      localStorage.setItem(getStorageKey('propmate_reminders'), JSON.stringify(reminders));
+      localStorage.setItem(getStorageKey('properties'), JSON.stringify(properties));
+      localStorage.setItem(getStorageKey('clients'), JSON.stringify(clients));
+      localStorage.setItem(getStorageKey('reminders'), JSON.stringify(reminders));
     }
   }, [properties, clients, reminders, isLoggedIn, currentUserEmail]);
 
@@ -80,8 +86,8 @@ const App: React.FC = () => {
     setClients(clients.map(c => c.id === id ? { ...c, isFavorite: !c.isFavorite } : c));
   };
 
-  const addProperty = (prop: Property) => setProperties([prop, ...properties]);
-  const addClient = (client: Client) => setClients([client, ...clients]);
+  const addProperty = (prop: Property) => setProperties([{...prop, tenantId: currentUserEmail || ''}, ...properties]);
+  const addClient = (client: Client) => setClients([{...client, tenantId: currentUserEmail || ''}, ...clients]);
   const addReminder = (rem: Reminder) => setReminders([rem, ...reminders]);
 
   const toggleReminder = (id: string) => {
@@ -94,6 +100,10 @@ const App: React.FC = () => {
   const updateReminder = (id: string, updates: Partial<Reminder>) => {
     setReminders(reminders.map(r => r.id === id ? { ...r, ...updates } : r));
   };
+
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {

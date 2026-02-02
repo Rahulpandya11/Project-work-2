@@ -121,8 +121,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, clients, remin
                   <div key={p.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:bg-white hover:shadow-lg transition-all cursor-pointer group" onClick={() => onNavigate(NavigationTab.PROPERTIES)}>
                     <img src={p.photos[0]} className="w-14 h-14 rounded-xl object-cover" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">{p.title}</p>
-                      <p className="text-[10px] text-slate-400 flex items-center gap-1"><MapPin size={10}/> {p.location.area}</p>
+                      <p className="text-sm font-bold text-black truncate group-hover:text-indigo-600 transition-colors">{p.title}</p>
+                      <p className="text-[10px] text-slate-900 flex items-center gap-1 font-bold"><MapPin size={10}/> {p.location.area}</p>
                     </div>
                     <Star size={14} className="text-amber-400 fill-amber-400" />
                   </div>
@@ -134,8 +134,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, clients, remin
                   <div key={c.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4 hover:bg-white hover:shadow-lg transition-all cursor-pointer group" onClick={() => onNavigate(NavigationTab.CLIENTS)}>
                     <div className="w-14 h-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-black text-xl">{c.name[0]}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-900 truncate group-hover:text-emerald-600 transition-colors">{c.name}</p>
-                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">{c.leadStage}</p>
+                      <p className="text-sm font-bold text-black truncate group-hover:text-emerald-600 transition-colors">{c.name}</p>
+                      <p className="text-[10px] text-slate-900 uppercase tracking-widest font-black">{c.leadStage}</p>
                     </div>
                     <Star size={14} className="text-amber-400 fill-amber-400" />
                   </div>
@@ -164,11 +164,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ properties, clients, remin
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded text-[8px] font-black uppercase tracking-widest">{rem.type}</span>
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-slate-900">
                           <Clock size={10}/> {new Date(rem.time).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <h4 className="font-bold text-slate-900 truncate">{rem.title}</h4>
+                      <h4 className="font-black text-black truncate">{rem.title}</h4>
                     </div>
                     <button 
                       onClick={() => onToggleReminder?.(rem.id)}

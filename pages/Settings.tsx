@@ -73,22 +73,27 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userPlan, onUpgrade,
               <div className="space-y-10 animate-in slide-in-from-bottom-4">
                 <div className="flex items-center gap-8">
                    <div className="relative group">
-                     <div className="w-32 h-32 rounded-[2.5rem] bg-slate-100 overflow-hidden border-4 border-white shadow-xl">
-                        <img src="https://picsum.photos/seed/agency/200" className="w-full h-full object-cover" alt="" />
+                     <div className="w-40 h-40 rounded-[2.5rem] bg-indigo-50 overflow-hidden border-4 border-white shadow-xl ring-1 ring-slate-100">
+                        <img 
+                          src="https://api.dicebear.com/7.x/avataaars/svg?seed=Piyush&backgroundColor=b6e3f4" 
+                          className="w-full h-full object-cover" 
+                          alt="Agency Avatar" 
+                          onError={(e) => { e.currentTarget.src = "https://picsum.photos/seed/agency/200" }}
+                        />
                      </div>
-                     <button className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 transition-all">
-                        <Camera size={18}/>
+                     <button className="absolute -bottom-2 -right-2 p-3 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 transition-all border-2 border-white">
+                        <Camera size={20}/>
                      </button>
                    </div>
                    <div>
-                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Agency Identity</h3>
-                     <p className="text-sm text-slate-500 font-medium">This is how your profile appears to clients in reports.</p>
+                     <h3 className="text-3xl font-black text-slate-900 tracking-tight">Agency Identity</h3>
+                     <p className="text-sm text-slate-500 font-black uppercase tracking-widest mt-1">Premium Managed Workspace</p>
                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-10">
                   <SettingsInput label="Agency Full Name" defaultValue="Malhotra Group Real Estate" />
-                  <SettingsInput label="Primary Agent" defaultValue="Agent S. Malhotra" />
+                  <SettingsInput label="Primary Agent" defaultValue="Piyush Malhotra" />
                   <SettingsInput label="Business Registration ID" defaultValue="IND-REA-9988-XM" />
                   <SettingsInput label="Default Operating City" defaultValue="Mumbai" />
                 </div>
@@ -239,7 +244,7 @@ const SettingsInput = ({ label, defaultValue }: any) => (
   <div className="space-y-3">
     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{label}</label>
     <input 
-      className="w-full px-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-slate-900 font-black tracking-tight focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 transition-all" 
+      className="w-full px-6 py-4.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm text-black font-black tracking-tight focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 transition-all" 
       defaultValue={defaultValue} 
     />
   </div>

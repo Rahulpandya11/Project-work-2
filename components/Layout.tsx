@@ -36,7 +36,7 @@ export const Layout: React.FC<LayoutProps> = ({
   onGoHome,
   reminders = [],
   onToggleReminder,
-  userEmail = 'agent@propmate.ai'
+  userEmail = 'Piyushdidwania@gmail.com'
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFabOpen, setIsFabOpen] = useState(false);
@@ -75,6 +75,9 @@ export const Layout: React.FC<LayoutProps> = ({
     { id: 'properties', label: 'Properties', icon: <Home size={18} />, action: onQuickViewProperties },
   ];
 
+  // Robust profile photo generation based on email
+  const profilePhotoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userEmail || 'Piyush')}&background=6366f1&color=fff&size=128&bold=true`;
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">
       <aside className={`${isSidebarOpen ? 'w-72' : 'w-24'} transition-all duration-500 bg-indigo-950 text-white hidden lg:flex flex-col border-r border-indigo-900/50 shadow-2xl z-40`}>
@@ -110,7 +113,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 <ShieldCheck size={12} className="text-indigo-400" />
                 <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Private Data Space</span>
              </div>
-             <p className="text-[10px] font-bold text-indigo-200 truncate">{userEmail}</p>
+             <p className="text-[10px] font-bold text-white truncate">{userEmail}</p>
           </div>
           <button onClick={onLogout} className="w-full flex items-center gap-4 px-5 py-4 text-indigo-400 hover:text-rose-400 transition-all rounded-2xl font-bold text-sm hover:bg-rose-500/5 group">
             <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
@@ -127,7 +130,7 @@ export const Layout: React.FC<LayoutProps> = ({
               <input 
                 type="text" 
                 placeholder="Search workspace..." 
-                className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-transparent rounded-[1.5rem] text-sm text-black focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 focus:outline-none transition-all font-medium" 
+                className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-transparent rounded-[1.5rem] text-sm text-black focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 focus:outline-none transition-all font-black" 
               />
             </div>
           </div>
@@ -166,7 +169,7 @@ export const Layout: React.FC<LayoutProps> = ({
                              <Clock size={18} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-bold text-slate-900 truncate">{rem.title}</p>
+                            <p className="text-sm font-black text-black truncate">{rem.title}</p>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">
                               {new Date(rem.time).toLocaleString()}
                             </p>
@@ -192,14 +195,19 @@ export const Layout: React.FC<LayoutProps> = ({
             
             <div className="flex items-center gap-5 pl-8 border-l border-slate-100">
                <div className="text-right hidden sm:block">
-                <p className="text-sm font-black text-slate-900">Workspace User</p>
+                <p className="text-sm font-black text-black">Piyush Malhotra</p>
                 <div className="flex items-center gap-1 justify-end">
                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Session</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Session</span>
                 </div>
               </div>
-              <div className="w-14 h-14 rounded-[1.25rem] bg-indigo-50 border-4 border-white shadow-xl overflow-hidden transform hover:rotate-3 transition-transform cursor-pointer">
-                <img src={`https://picsum.photos/seed/${userEmail}/100`} className="w-full h-full object-cover" alt="Profile" />
+              <div className="w-14 h-14 rounded-[1.25rem] bg-indigo-50 border-4 border-white shadow-xl overflow-hidden transform hover:rotate-3 transition-all cursor-pointer ring-1 ring-slate-100 flex items-center justify-center">
+                <img 
+                  src={profilePhotoUrl} 
+                  className="w-full h-full object-cover" 
+                  alt="Profile" 
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
