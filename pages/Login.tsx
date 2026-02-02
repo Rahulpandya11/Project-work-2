@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Lock, Mail, ArrowRight, ShieldCheck, Info, Zap } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface LoginProps {
   onLogin: (email: string) => void;
@@ -17,14 +17,12 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
     setError('');
 
-    // Simulate secure workspace provisioning
+    // Secure workspace provisioning for Piyush
     setTimeout(() => {
       if (email === 'Piyushdidwania@gmail.com' && password === 'Piyush@123') {
         onLogin(email);
-      } else if (email === 'agent@propmate.ai' && password === 'password123') {
-        onLogin(email);
       } else {
-        setError('Unauthorized credentials. Access restricted to Piyush Admin.');
+        setError('Unauthorized credentials. Access restricted to Admin.');
         setIsLoading(false);
       }
     }, 1200);
@@ -32,7 +30,6 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden font-sans">
-      {/* Premium Backdrop */}
       <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[160px] animate-pulse"></div>
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-600 rounded-full blur-[160px] animate-pulse" style={{ animationDelay: '2s' }}></div>
@@ -91,17 +88,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                 disabled={isLoading}
                 className="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] transition-all active:scale-95 disabled:opacity-70 group"
               >
-                {isLoading ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Syncing Cloud...
-                  </div>
-                ) : (
-                  <>
-                    Initialize Workspace
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
+                {isLoading ? 'Syncing Cloud...' : 'Initialize Workspace'}
               </button>
             </form>
           </div>
@@ -113,14 +100,10 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
              </div>
              <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="text-[9px] text-emerald-600 font-black uppercase tracking-widest">Vercel Edge Ready</span>
+                <span className="text-[9px] text-emerald-600 font-black uppercase tracking-widest">Vercel Ready</span>
              </div>
           </div>
         </div>
-        
-        <p className="text-center text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mt-8 opacity-50">
-          Powered by PropMate Intelligence • Module 19 Active
-        </p>
       </div>
     </div>
   );
