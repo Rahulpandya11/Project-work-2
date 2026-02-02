@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Plus, Search, MapPin, X, Star, Trash2, Building, TrendingUp, Phone, Mail, User, Briefcase, UsersIcon, Calendar, Info, ShieldCheck } from 'lucide-react';
-import { Client, LeadStage, TransactionType, FurnishingStatus } from '../types';
+import { Plus, Search, MapPin, X, Star, Trash2, Building, TrendingUp, Phone, Mail, User, Briefcase, UsersIcon, Calendar, Info, ShieldCheck, UserCheck } from 'lucide-react';
+import { Client, LeadStage, TransactionType, FurnishingStatus, ListingSource } from '../types';
 
 interface ClientsPageProps {
   clients: Client[];
@@ -80,7 +80,10 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({
                           <p className="text-base font-black text-black">{client.name}</p>
                           {client.isFavorite && <Star size={12} className="text-amber-400 fill-amber-400" />}
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{client.profession || 'Self Employed'}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{client.profession || 'Self Employed'}</p>
+                          <span className="px-2 py-0.5 bg-slate-100 text-[8px] font-black uppercase text-slate-500 rounded">{client.listingSource}</span>
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -141,7 +144,12 @@ const ClientDetailModal: React.FC<{ client: Client; onClose: () => void }> = ({ 
            </div>
            <div>
              <h2 className="text-3xl font-black text-slate-900 tracking-tight">{client.name}</h2>
-             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">{client.leadStage} Lead</p>
+             <div className="flex items-center gap-2 mt-1">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{client.leadStage} Lead</p>
+               <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${client.listingSource === ListingSource.DIRECT ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                 {client.listingSource}
+               </span>
+             </div>
            </div>
         </div>
         <button onClick={onClose} className="p-4 hover:bg-white rounded-2xl text-slate-400 shadow-sm border border-transparent hover:border-slate-100 transition-all">
@@ -150,6 +158,28 @@ const ClientDetailModal: React.FC<{ client: Client; onClose: () => void }> = ({ 
       </div>
 
       <div className="flex-1 overflow-y-auto p-12 space-y-12">
+        {client.listingSource === ListingSource.BROKER && (
+          <section className="animate-in slide-in-from-top-2">
+            <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4">Referral Source</h4>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="p-6 bg-indigo-50/30 rounded-[2rem] border border-indigo-100 flex items-center gap-4">
+                <UserCheck className="text-indigo-600" />
+                <div>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Broker Name</p>
+                  <p className="text-sm font-black text-black">{client.brokerName || 'Not Specified'}</p>
+                </div>
+              </div>
+              <div className="p-6 bg-indigo-50/30 rounded-[2rem] border border-indigo-100 flex items-center gap-4">
+                <Phone className="text-indigo-600" />
+                <div>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Broker Contact</p>
+                  <p className="text-sm font-black text-black">{client.brokerNumber || 'Not Specified'}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <div className="space-y-6">
              <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Contact & Identity</h4>
@@ -229,7 +259,8 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
     maritalStatus: 'Bachelor', familySize: 1, requirement: TransactionType.RENT,
     preferredAreas: [], preferredCity: 'Mumbai', bhkPreference: ['2BHK'],
     furnishingPreference: [FurnishingStatus.SEMI], budgetMin: 0, budgetMax: 0,
-    moveInDate: new Date().toISOString().split('T')[0]
+    moveInDate: new Date().toISOString().split('T')[0],
+    listingSource: ListingSource.DIRECT, brokerName: '', brokerNumber: ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -257,6 +288,33 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
         </div>
         
         <form onSubmit={handleSubmit} className="p-10 overflow-y-auto space-y-10 custom-scrollbar">
+          {/* Section: Source Selection */}
+          <div className="space-y-6">
+            <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Lead Origin</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, listingSource: ListingSource.DIRECT})}
+                className={`p-5 rounded-[1.5rem] border text-xs font-black uppercase tracking-widest transition-all ${formData.listingSource === ListingSource.DIRECT ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl' : 'bg-slate-50 border-slate-100 text-slate-400 hover:bg-white'}`}
+              >
+                Direct Lead
+              </button>
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, listingSource: ListingSource.BROKER})}
+                className={`p-5 rounded-[1.5rem] border text-xs font-black uppercase tracking-widest transition-all ${formData.listingSource === ListingSource.BROKER ? 'bg-indigo-600 border-indigo-600 text-white shadow-xl' : 'bg-slate-50 border-slate-100 text-slate-400 hover:bg-white'}`}
+              >
+                Via Broker
+              </button>
+            </div>
+            {formData.listingSource === ListingSource.BROKER && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-2">
+                <Input label="Broker Full Name" placeholder="Referral partner name" onChange={v => setFormData({...formData, brokerName: v})} />
+                <Input label="Broker Phone" placeholder="+91 00000 00000" onChange={v => setFormData({...formData, brokerNumber: v})} />
+              </div>
+            )}
+          </div>
+
           <div className="space-y-6">
             <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Contact Information</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
