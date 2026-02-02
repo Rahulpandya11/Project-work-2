@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { Plus, Search, MapPin, X, Star, Trash2, Building, TrendingUp, Phone, Mail, User, Briefcase, UsersIcon, Calendar, Info, ShieldCheck, UserCheck } from 'lucide-react';
+import { Plus, Search, MapPin, X, Star, Trash2, Building, TrendingUp, Phone, Mail, User, Briefcase, UsersIcon, Calendar, Info, ShieldCheck, UserCheck, Edit2 } from 'lucide-react';
 import { Client, LeadStage, TransactionType, FurnishingStatus, ListingSource } from '../types';
 
 interface ClientsPageProps {
   clients: Client[];
   onAdd: (client: Client) => void;
+  onUpdate: (client: Client) => void;
   onDelete: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   onAutoMatch: (client: Client) => void;
@@ -14,11 +15,13 @@ interface ClientsPageProps {
 export const ClientsPage: React.FC<ClientsPageProps> = ({ 
   clients, 
   onAdd, 
+  onUpdate,
   onDelete, 
   onToggleFavorite,
   onAutoMatch 
 }) => {
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,6 +31,17 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({
     c.phone.includes(searchQuery)
   );
 
+  const handleEditClick = (e: React.MouseEvent, client: Client) => {
+    e.stopPropagation();
+    setEditingClient(client);
+    setShowFormModal(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingClient(null);
+    setShowFormModal(true);
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -36,7 +50,7 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({
           <p className="text-slate-500 text-sm font-medium">Manage comprehensive client profiles.</p>
         </div>
         <button 
-          onClick={() => setShowAddModal(true)}
+          onClick={handleAddNew}
           className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl hover:bg-indigo-700 transition-all"
         >
           <Plus size={20} /> Register Detailed Lead
@@ -111,6 +125,12 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({
                         <TrendingUp size={16} /> Smart Match
                       </button>
                       <button 
+                        onClick={(e) => handleEditClick(e, client)}
+                        className="text-slate-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Edit2 size={20} />
+                      </button>
+                      <button 
                         onClick={() => onToggleFavorite(client.id)}
                         className={`transition-all ${client.isFavorite ? 'text-amber-400' : 'text-slate-300 hover:text-amber-400'}`}
                       >
@@ -128,7 +148,17 @@ export const ClientsPage: React.FC<ClientsPageProps> = ({
         </div>
       </div>
 
-      {showAddModal && <AddClientModal onClose={() => setShowAddModal(false)} onAdd={onAdd} />}
+      {showFormModal && (
+        <ClientFormModal 
+          onClose={() => { setShowFormModal(false); setEditingClient(null); }} 
+          onSave={(c) => {
+            editingClient ? onUpdate(c) : onAdd(c);
+            setShowFormModal(false);
+            setEditingClient(null);
+          }} 
+          initialData={editingClient}
+        />
+      )}
       {selectedClient && <ClientDetailModal client={selectedClient} onClose={() => setSelectedClient(null)} />}
     </div>
   );
@@ -253,8 +283,8 @@ const RequirementBlock = ({ label, value }: { label: string, value: string }) =>
   </div>
 );
 
-const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void }> = ({ onClose, onAdd }) => {
-  const [formData, setFormData] = useState<Partial<Client>>({ 
+const ClientFormModal: React.FC<{ onClose: () => void; onSave: (c: Client) => void; initialData?: Client | null }> = ({ onClose, onSave, initialData }) => {
+  const [formData, setFormData] = useState<Partial<Client>>(initialData || { 
     name: '', phone: '', email: '', description: '', profession: '', 
     maritalStatus: 'Bachelor', familySize: 1, requirement: TransactionType.RENT,
     preferredAreas: [], preferredCity: 'Mumbai', bhkPreference: ['2BHK'],
@@ -265,15 +295,14 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAdd({
+    onSave({
       ...(formData as Client),
-      id: `c${Date.now()}`,
-      leadStage: LeadStage.NEW,
-      createdAt: new Date().toISOString(),
-      isFavorite: false,
-      tags: []
+      id: formData.id || `c${Date.now()}`,
+      leadStage: formData.leadStage || LeadStage.NEW,
+      createdAt: formData.createdAt || new Date().toISOString(),
+      isFavorite: formData.isFavorite || false,
+      tags: formData.tags || []
     });
-    onClose();
   };
 
   return (
@@ -281,8 +310,8 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
       <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="px-10 py-8 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
           <div>
-            <h2 className="text-2xl font-black text-slate-900">Register Detailed Lead</h2>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Lead Capture Protocol</p>
+            <h2 className="text-2xl font-black text-slate-900">{initialData ? 'Update Lead Profile' : 'Register Detailed Lead'}</h2>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{initialData ? 'Modify CRM Record' : 'Lead Capture Protocol'}</p>
           </div>
           <button onClick={onClose} className="p-4 hover:bg-slate-100 rounded-2xl text-slate-400 transition-all"><X size={24}/></button>
         </div>
@@ -309,8 +338,8 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
             </div>
             {formData.listingSource === ListingSource.BROKER && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-2">
-                <Input label="Broker Full Name" placeholder="Referral partner name" onChange={v => setFormData({...formData, brokerName: v})} />
-                <Input label="Broker Phone" placeholder="+91 00000 00000" onChange={v => setFormData({...formData, brokerNumber: v})} />
+                <Input label="Broker Full Name" value={formData.brokerName || ''} placeholder="Referral partner name" onChange={v => setFormData({...formData, brokerName: v})} />
+                <Input label="Broker Phone" value={formData.brokerNumber || ''} placeholder="+91 00000 00000" onChange={v => setFormData({...formData, brokerNumber: v})} />
               </div>
             )}
           </div>
@@ -318,9 +347,9 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
           <div className="space-y-6">
             <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Contact Information</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Input label="Full Name" required onChange={v => setFormData({...formData, name: v})} />
-              <Input label="Phone Number" required onChange={v => setFormData({...formData, phone: v})} />
-              <Input label="Email Address" onChange={v => setFormData({...formData, email: v})} />
+              <Input label="Full Name" value={formData.name || ''} required onChange={v => setFormData({...formData, name: v})} />
+              <Input label="Phone Number" value={formData.phone || ''} required onChange={v => setFormData({...formData, phone: v})} />
+              <Input label="Email Address" value={formData.email || ''} onChange={v => setFormData({...formData, email: v})} />
             </div>
           </div>
 
@@ -329,15 +358,15 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Type</label>
-                 <select className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black appearance-none" onChange={e => setFormData({...formData, requirement: e.target.value as any})}>
+                 <select value={formData.requirement || TransactionType.RENT} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black appearance-none" onChange={e => setFormData({...formData, requirement: e.target.value as any})}>
                     <option value={TransactionType.RENT}>Rent</option><option value={TransactionType.SALE}>Sale</option>
                  </select>
                </div>
-               <Input label="Min Budget" type="number" onChange={v => setFormData({...formData, budgetMin: Number(v)})} />
-               <Input label="Max Budget" type="number" onChange={v => setFormData({...formData, budgetMax: Number(v)})} />
+               <Input label="Min Budget" value={String(formData.budgetMin || 0)} type="number" onChange={v => setFormData({...formData, budgetMin: Number(v)})} />
+               <Input label="Max Budget" value={String(formData.budgetMax || 0)} type="number" onChange={v => setFormData({...formData, budgetMax: Number(v)})} />
                <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Move-in Date</label>
-                 <input type="date" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, moveInDate: e.target.value})} />
+                 <input type="date" value={formData.moveInDate || ''} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, moveInDate: e.target.value})} />
                </div>
             </div>
           </div>
@@ -345,31 +374,34 @@ const AddClientModal: React.FC<{ onClose: () => void; onAdd: (c: Client) => void
           <div className="space-y-6">
             <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Profile Narrative</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <Input label="Profession" placeholder="e.g. Software Architect" onChange={v => setFormData({...formData, profession: v})} />
+               <Input label="Profession" value={formData.profession || ''} placeholder="e.g. Software Architect" onChange={v => setFormData({...formData, profession: v})} />
                <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Family Size</label>
-                 <input type="number" className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, familySize: Number(e.target.value)})} />
+                 <input type="number" value={formData.familySize || 1} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" onChange={e => setFormData({...formData, familySize: Number(e.target.value)})} />
                </div>
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Requirement Description</label>
-              <textarea required className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black min-h-[100px]" placeholder="Specific details about views, floors, or Vastu..." onChange={e => setFormData({...formData, description: e.target.value})} />
+              <textarea required value={formData.description || ''} className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black min-h-[100px]" placeholder="Specific details about views, floors, or Vastu..." onChange={e => setFormData({...formData, description: e.target.value})} />
             </div>
           </div>
 
-          <button type="submit" className="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl hover:bg-indigo-700 transition-all">Submit Lead to CRM</button>
+          <button type="submit" className="w-full py-6 bg-indigo-600 text-white rounded-[2rem] font-black uppercase text-xs shadow-2xl hover:bg-indigo-700 transition-all">
+            {initialData ? 'Update Lead Data' : 'Submit Lead to CRM'}
+          </button>
         </form>
       </div>
     </div>
   );
 };
 
-const Input = ({ label, type = 'text', placeholder, required, onChange }: { label: string, type?: string, placeholder?: string, required?: boolean, onChange: (v: string) => void }) => (
+const Input = ({ label, value, type = 'text', placeholder, required, onChange }: { label: string, value?: string, type?: string, placeholder?: string, required?: boolean, onChange: (v: string) => void }) => (
   <div className="space-y-2">
     <label className="text-[10px] font-black text-slate-400 uppercase ml-2">{label}</label>
     <input 
       type={type} 
       required={required}
+      value={value}
       className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black text-black" 
       placeholder={placeholder}
       onChange={e => onChange(e.target.value)} 
